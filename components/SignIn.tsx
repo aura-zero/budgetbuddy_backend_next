@@ -83,7 +83,7 @@ export default function SignIn() {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+        <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#1b143a] from-0% to-[#07011F] to-45% p-4">
             <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
                 <h2 className="mb-6 text-center text-3xl font-bold">Sign In</h2>
                 {error && (

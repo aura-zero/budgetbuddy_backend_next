@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 interface UserInfo {
     id: string;
@@ -18,21 +19,20 @@ export default function UserInfo() {
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
-                const response = await fetch("/api/whoAmI", {
+                const response = await axios.get("/api/whoAmI", {
                     headers: {
-                        // accessToken: localStorage.getItem("accessToken") || "",
+                        accessToken: localStorage.getItem("accessToken") || "",
                         refreshToken: localStorage.getItem("refreshToken") || "",
                     },
                 });
 
-                if (!response.ok) {
-                    throw new Error("Failed to fetch user information");
-                }
-
-                const data = await response.json();
-                setUserInfo(data.userInformation);
+                setUserInfo(response.data.userInformation);
             } catch (err) {
-                setError(err instanceof Error ? err.message : "An error occurred");
+                setError(
+                    axios.isAxiosError(err)
+                        ? err.response?.data?.message || "An error occurred"
+                        : "An error occurred",
+                );
             } finally {
                 setLoading(false);
             }
@@ -43,7 +43,7 @@ export default function UserInfo() {
 
     if (loading) {
         return (
-            <div className="w-full max-w-md mx-auto bg-white shadow-md rounded-lg p-6">
+            <div className="w-full max-w-md  bg-white shadow-md rounded-lg p-6 my-auto">
                 <h2 className="text-2xl font-bold mb-4">User Information</h2>
                 <div className="space-y-4">
                     <div className="h-12 w-12 rounded-full bg-gray-200 animate-pulse"></div>
@@ -65,7 +65,7 @@ export default function UserInfo() {
     }
 
     return (
-        <div className="w-full max-w-md bg-blue-300 shadow-md rounded-lg my-auto p-4">
+        <div className="w-full max-w-md mx-auto bg-white shadow-md rounded-lg p-6 my-auto">
             <h2 className="text-2xl font-bold mb-4">User Information</h2>
             <div className="space-y-4">
                 <div className="flex items-center space-x-4">
@@ -77,23 +77,23 @@ export default function UserInfo() {
                                 className="h-full w-full object-cover"
                             />
                         ) : (
-                            <div className="h-full w-full flex items-center justify-center text-xl font-bold text-gray-950">
+                            <div className="h-full w-full flex items-center justify-center text-xl font-bold text-gray-500">
                                 {userInfo?.name?.charAt(0)}
                             </div>
                         )}
                     </div>
                     <div>
                         <p className="font-medium">{userInfo?.name}</p>
-                        <p className="text-sm text-gray-950">@{userInfo?.userName}</p>
+                        <p className="text-sm text-gray-500">@{userInfo?.userName}</p>
                     </div>
                 </div>
                 <div>
                     <p className="text-sm font-medium">Email</p>
-                    <p className="text-sm text-gray-950">{userInfo?.email}</p>
+                    <p className="text-sm text-gray-500">{userInfo?.email}</p>
                 </div>
                 <div>
                     <p className="text-sm font-medium">User ID</p>
-                    <p className="text-sm text-gray-950">{userInfo?.id}</p>
+                    <p className="text-sm text-gray-500">{userInfo?.id}</p>
                 </div>
             </div>
         </div>
