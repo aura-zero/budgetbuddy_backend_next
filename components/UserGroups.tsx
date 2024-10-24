@@ -49,7 +49,7 @@ export default function UserGroups() {
 
     if (loading) {
         return (
-            <div className="w-full max-w-md mx-auto bg-white shadow-md rounded-lg p-6">
+            <div className="w-full max-w-md  bg-white shadow-md rounded-lg p-6">
                 <h2 className="text-2xl font-bold mb-4">Your Groups</h2>
                 <div className="space-y-2">
                     {[...Array(3)].map((_, index) => (
