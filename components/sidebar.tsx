@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, Home, Users, DollarSign, Settings, ChevronRight } from "lucide-react";
+import { SidebarProvider } from "./ui/sidebar";
 
 export default function Sidebar() {
     const [isOpen, setIsOpen] = useState(false);
@@ -87,6 +88,8 @@ export default function Sidebar() {
                     </ul>
                 </nav>
             </aside>
+
+            <SidebarProvider></SidebarProvider>
         </div>
     );
 }
