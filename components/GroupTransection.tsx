@@ -2,13 +2,31 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { format } from "date-fns";
+import {
+    format,
+    getMonth,
+    getWeek,
+    startOfWeek,
+    endOfWeek,
+    eachDayOfInterval,
+} from "date-fns";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 interface Transaction {
     id: string;
     description: string;
     amount: number;
     date: string;
+    month: number;
+    week: number;
     category: {
         id: string;
         name: string;
@@ -21,10 +39,25 @@ interface Transaction {
     };
 }
 
+function filterTransactions(
+    transactions: Transaction[],
+    filters: { month?: number; week?: number },
+): Transaction[] {
+    return transactions.filter((transaction) => {
+        const monthMatch = filters.month ? transaction.month === filters.month : true;
+        const weekMatch = filters.week ? transaction.week === filters.week : true;
+        return monthMatch && weekMatch;
+    });
+}
+
 export default function GroupTransactions({ groupId }: { groupId: string }) {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [selectedMonth, setSelectedMonth] = useState<number | undefined>(undefined);
+    const [selectedWeek, setSelectedWeek] = useState<number | undefined>(undefined);
+    const [viewMode, setViewMode] = useState<"all" | "monthly" | "weekly">("all");
 
     useEffect(() => {
         const fetchTransactions = async () => {
@@ -36,7 +69,15 @@ export default function GroupTransactions({ groupId }: { groupId: string }) {
                         refreshToken: localStorage.getItem("refreshToken") || "",
                     },
                 });
-                setTransactions(response.data);
+                const transactionsWithDateInfo = response.data.map(
+                    (transaction: Transaction) => ({
+                        ...transaction,
+                        month: getMonth(new Date(transaction.date)) + 1,
+                        week: getWeek(new Date(transaction.date)),
+                    }),
+                );
+                setTransactions(transactionsWithDateInfo);
+                setFilteredTransactions(transactionsWithDateInfo);
             } catch (err) {
                 setError(
                     axios.isAxiosError(err)
@@ -51,12 +92,29 @@ export default function GroupTransactions({ groupId }: { groupId: string }) {
         fetchTransactions();
     }, [groupId]);
 
+    useEffect(() => {
+        let filtered = transactions;
+        if (viewMode === "monthly" && selectedMonth) {
+            filtered = filterTransactions(transactions, { month: selectedMonth });
+        } else if (viewMode === "weekly" && selectedWeek) {
+            filtered = filterTransactions(transactions, { week: selectedWeek });
+        }
+        setFilteredTransactions(filtered);
+    }, [transactions, selectedMonth, selectedWeek, viewMode]);
+
+    const getWeekDates = (week: number) => {
+        const currentYear = new Date().getFullYear();
+        const startDate = startOfWeek(new Date(currentYear, 0, 1 + (week - 1) * 7));
+        const endDate = endOfWeek(startDate);
+        return `${format(startDate, "MMM d")} - ${format(endDate, "MMM d, yyyy")}`;
+    };
+
     if (loading) {
         return (
-            <div className="w-full max-w-4xl mx-auto p-4">
+            <div className="w-full p-4 space-y-4 bg-[#111B27] text-white min-h-screen">
                 <div className="animate-pulse space-y-4">
                     {[...Array(5)].map((_, index) => (
-                        <div key={index} className="h-20 bg-gray-200 rounded"></div>
+                        <div key={index} className="h-20 bg-zinc-800 rounded"></div>
                     ))}
                 </div>
             </div>
@@ -65,9 +123,9 @@ export default function GroupTransactions({ groupId }: { groupId: string }) {
 
     if (error) {
         return (
-            <div className="w-full max-w-4xl mx-auto p-4">
+            <div className="w-full p-4 bg-zinc-950 text-white min-h-screen">
                 <div
-                    className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+                    className="bg-red-900 border border-red-600 text-red-100 px-4 py-3 rounded relative"
                     role="alert"
                 >
                     <strong className="font-bold">Error!</strong>
@@ -78,52 +136,121 @@ export default function GroupTransactions({ groupId }: { groupId: string }) {
     }
 
     return (
-        <div className="w-full max-w-4xl mx-auto p-4 ">
-            groupsy
-            <h2 className="text-2xl font-bold mb-4">Group Transactions</h2>
-            {transactions.length === 0 ? (
-                <p className="text-gray-500">No transactions found for this group.</p>
-            ) : (
+        <div className="w-auto p-4 space-y-4  text-white min-h-screen drop-shadow-lg">
+            <div className="flex justify-between items-center">
+                <Tabs
+                    defaultValue="all"
+                    className="w-auto"
+                    onValueChange={(value) => setViewMode(value)}
+                >
+                    <TabsList className="bg-[#1A1F2E]">
+                        <TabsTrigger
+                            value="all"
+                            className="data-[state=active]:bg-[#FF9601] text-white"
+                        >
+                            All
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value="monthly"
+                            className="data-[state=active]:bg-[#FF9601] text-white"
+                        >
+                            Monthly
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value="weekly"
+                            className="data-[state=active]:bg-[#FF9601] text-white"
+                        >
+                            Weekly
+                        </TabsTrigger>
+                    </TabsList>
+                </Tabs>
+            </div>
+
+            {viewMode === "monthly" && (
+                <Select onValueChange={(value) => setSelectedMonth(Number(value))}>
+                    <SelectTrigger className="w-[180px] bg-[#1A1F2E] text-white border-none">
+                        <SelectValue placeholder="Select month" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1A1F2E] text-white border-[#2D3648]">
+                        {[...Array(12)].map((_, i) => (
+                            <SelectItem
+                                key={i + 1}
+                                value={(i + 1).toString()}
+                                className="hover:bg-[#2D3648]"
+                            >
+                                {format(new Date(2023, i, 1), "MMMM")}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            )}
+
+            {viewMode === "weekly" && (
+                <Select onValueChange={(value) => setSelectedWeek(Number(value))}>
+                    <SelectTrigger className="w-[180px] bg-[#1A1F2E] text-white border-none">
+                        <SelectValue placeholder="Select week" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1A1F2E] text-white border-[#2D3648]">
+                        {[...Array(53)].map((_, i) => (
+                            <SelectItem
+                                key={i + 1}
+                                value={(i + 1).toString()}
+                                className="hover:bg-[#2D3648]"
+                            >
+                                Week {i + 1}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            )}
+
+            <Card className="bg-[#1A1F2E] border-none p-4 drop-shadow-md">
                 <div className="overflow-x-auto">
-                    <table className="min-w-full bg-white">
-                        <thead className="bg-gray-50">
+                    <table className="w-full border-separate border-spacing-y-2">
+                        <thead>
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="text-left px-4 py-2 text-sm font-normal text-gray-400">
                                     Date
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="text-left px-4 py-2 text-sm font-normal text-gray-400">
                                     Description
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="text-left px-4 py-2 text-sm font-normal text-gray-400">
                                     Amount
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="text-left px-4 py-2 text-sm font-normal text-gray-400">
                                     Category
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="text-left px-4 py-2 text-sm font-normal text-gray-400">
                                     User
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {transactions.map((transaction) => (
-                                <tr key={transaction.id}>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <tbody>
+                            {filteredTransactions.map((transaction) => (
+                                <tr
+                                    key={transaction.id}
+                                    className="bg-[#2D3648]/30 hover:bg-[#2D3648] transition-colors"
+                                >
+                                    <td className="px-4 py-3 text-sm text-gray-300 rounded-l-lg">
                                         {format(
                                             new Date(transaction.date),
                                             "MMM d, yyyy",
                                         )}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <td className="px-4 py-3 text-sm text-gray-300">
                                         {transaction.description}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <td className="px-4 py-3 text-sm text-gray-300">
                                         ₹{transaction.amount.toFixed(2)}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {transaction.category.name}
+                                    <td className="px-4 py-3 text-sm text-gray-300">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-2 h-2 rounded-full bg-blue-500/80"></div>
+                                            {transaction.category.name}
+                                        </div>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <td className="px-4 py-3 text-sm text-gray-300 rounded-r-lg">
                                         {transaction.user.name}
                                     </td>
                                 </tr>
@@ -131,7 +258,7 @@ export default function GroupTransactions({ groupId }: { groupId: string }) {
                         </tbody>
                     </table>
                 </div>
-            )}
+            </Card>
         </div>
     );
 }
