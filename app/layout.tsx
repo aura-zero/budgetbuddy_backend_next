@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/navbar";
-import Sidebar from "@/components/sidebar";
 import "./globals.css";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
+
 export const metadata: Metadata = {
     title: "BudgetBuddy",
-    description: "Expence Tracker",
+    description: "Expense Tracker",
 };
 
 export default function RootLayout({
@@ -15,19 +15,14 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
-            <body className="antialiased">
-                {/* <Navbar />
-                <div className="flex">
-                    <Sidebar />
-                    <main className="flex-1 ">{children}</main>
-                </div> */}
-
+        <html lang="en" className="h-full">
+            <body className="flex h-full flex-col antialiased bg-[#07011F] text-white">
                 <Navbar />
                 <SidebarProvider>
-                    <AppSidebar />
-                    <SidebarTrigger />
-                    <main>{children}</main>
+                    <div className="flex flex-1 overflow-hidden">
+                        <AppSidebar />
+                        <main className="flex-1 overflow-y-auto p-4">{children}</main>
+                    </div>
                 </SidebarProvider>
             </body>
         </html>
