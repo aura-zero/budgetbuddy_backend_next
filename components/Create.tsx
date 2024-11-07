@@ -202,6 +202,7 @@ export default function CreateComponent() {
             </CardHeader>
             <CardContent>
                 <div className="mb-4">
+                    <h3>On Group</h3>
                     <Select
                         value={selectedGroupId || undefined}
                         onValueChange={handleGroupChange}

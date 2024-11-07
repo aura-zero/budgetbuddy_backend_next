@@ -1,4 +1,4 @@
-import { Calendar, Home, Icon, icons, Inbox, Search, Settings } from "lucide-react";
+import { Calendar, Home, Plus, Icon, icons, Inbox, Search, Settings } from "lucide-react";
 
 import {
     Sidebar,
@@ -9,6 +9,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { title } from "process";
 
@@ -19,11 +20,7 @@ const items = [
         url: "#",
         icon: Home,
     },
-    {
-        title: "Transections",
-        url: "/transection",
-        icon: Inbox,
-    },
+
     {
         title: "Budget",
         url: "#",
@@ -35,13 +32,13 @@ const items = [
         icon: Search,
     },
     {
-        title: "Settings",
-        url: "/check",
-        icon: Settings,
-    },
-    {
         title: "Create",
         url: "/create",
+        icon: Plus,
+    },
+    {
+        title: "Settings",
+        url: "/check",
         icon: Settings,
     },
 ];
@@ -60,7 +57,7 @@ export function AppSidebar() {
                                 {items.map((item) => (
                                     <SidebarMenuItem
                                         key={item.title}
-                                        className="text-white"
+                                        className="text-white drop-shadow-sm "
                                     >
                                         <SidebarMenuButton asChild>
                                             <a href={item.url}>
@@ -75,6 +72,9 @@ export function AppSidebar() {
                     </SidebarGroup>
                 </SidebarContent>
             </Sidebar>
+            <div className="drop-shadow-sm">
+                <SidebarTrigger />
+            </div>
         </div>
     );
 }

@@ -23,11 +23,6 @@ const items = [
         icon: Home,
     },
     {
-        title: "Transactions",
-        url: "/transection",
-        icon: Inbox,
-    },
-    {
         title: "Budget",
         url: "/budget",
         icon: Calendar,
