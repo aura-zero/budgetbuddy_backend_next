@@ -196,7 +196,7 @@ export default function CreateComponent() {
     }
 
     return (
-        <Card className="w-full max-w-md mx-auto bg-[#1A1F2E] text-white border-none">
+        <Card className="w-[360px] my-32 bg-[#1A1F2E] text-white border-none">
             <CardHeader>
                 <CardTitle>Create</CardTitle>
             </CardHeader>

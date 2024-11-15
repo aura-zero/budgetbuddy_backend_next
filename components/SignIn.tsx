@@ -83,7 +83,9 @@ export default function SignIn() {
     return (
         <div className="flex justify-center  items-center p-4">
             <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
-                <h2 className="mb-6 text-center text-3xl font-bold">Sign In</h2>
+                <h2 className="mb-6 text-center text-black text-3xl font-bold">
+                    Sign In
+                </h2>
                 {error && (
                     <div
                         className="mb-4 rounded-md bg-red-50 p-4 text-sm text-red-500"

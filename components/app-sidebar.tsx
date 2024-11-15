@@ -1,5 +1,15 @@
-import { Calendar, Home, Plus, Icon, icons, Inbox, Search, Settings } from "lucide-react";
-
+import {
+    Calendar,
+    Home,
+    Plus,
+    Icon,
+    icons,
+    Inbox,
+    Search,
+    Settings,
+    Group,
+} from "lucide-react";
+import UserInfo from "./UserInfo";
 import {
     Sidebar,
     SidebarContent,
@@ -22,14 +32,14 @@ const items = [
     },
 
     {
-        title: "Budget",
+        title: "Friends",
         url: "#",
-        icon: Calendar,
+        icon: Plus,
     },
     {
         title: "Groups",
         url: "/groups",
-        icon: Search,
+        icon: Group,
     },
     {
         title: "Create",
@@ -38,16 +48,16 @@ const items = [
     },
     {
         title: "Settings",
-        url: "/check",
+        url: "UserInfo",
         icon: Settings,
     },
 ];
 
 export function AppSidebar() {
     return (
-        <div className="flex h-screen w-[720px]">
+        <div className="flex ">
             <Sidebar>
-                <SidebarContent className="flex bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#1b143a] from-0% to-[#07011F] to-45% min-h-screen  items-center  justify-items-center overflow-x-hidden">
+                <SidebarContent className="flex bg-[#07011F] items-center  justify-items-center overflow-x-hidden">
                     <SidebarGroup>
                         <SidebarGroupLabel className="text-[#FF9601] text-2xl mb-5">
                             BudgetBuddy
@@ -72,7 +82,7 @@ export function AppSidebar() {
                     </SidebarGroup>
                 </SidebarContent>
             </Sidebar>
-            <div className="drop-shadow-sm">
+            <div className="drop-shadow-sm ">
                 <SidebarTrigger />
             </div>
         </div>
