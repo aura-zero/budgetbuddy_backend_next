@@ -2,14 +2,7 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-import {
-    format,
-    getMonth,
-    getWeek,
-    startOfWeek,
-    endOfWeek,
-    eachDayOfInterval,
-} from "date-fns";
+import { format, getMonth, getWeek } from "date-fns";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -19,6 +12,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Loader2, AlertCircle } from "lucide-react";
 
 interface Transaction {
     id: string;
@@ -62,7 +56,7 @@ export default function GroupTransactions({ groupId }: { groupId: string }) {
     useEffect(() => {
         const fetchTransactions = async () => {
             try {
-                groupId = "67193398934074225e0c5cc1";
+                setLoading(true);
                 const response = await axios.get(`/api/getTransaction/${groupId}`, {
                     headers: {
                         accessToken: localStorage.getItem("accessToken") || "",
@@ -89,7 +83,9 @@ export default function GroupTransactions({ groupId }: { groupId: string }) {
             }
         };
 
-        fetchTransactions();
+        if (groupId) {
+            fetchTransactions();
+        }
     }, [groupId]);
 
     useEffect(() => {
@@ -102,20 +98,12 @@ export default function GroupTransactions({ groupId }: { groupId: string }) {
         setFilteredTransactions(filtered);
     }, [transactions, selectedMonth, selectedWeek, viewMode]);
 
-    const getWeekDates = (week: number) => {
-        const currentYear = new Date().getFullYear();
-        const startDate = startOfWeek(new Date(currentYear, 0, 1 + (week - 1) * 7));
-        const endDate = endOfWeek(startDate);
-        return `${format(startDate, "MMM d")} - ${format(endDate, "MMM d, yyyy")}`;
-    };
-
     if (loading) {
         return (
-            <div className="w-full p-4 space-y-4 bg-[#111B27] text-white min-h-screen">
-                <div className="animate-pulse space-y-4">
-                    {[...Array(5)].map((_, index) => (
-                        <div key={index} className="h-20 bg-zinc-800 rounded"></div>
-                    ))}
+            <div className="w-full p-4 space-y-4 bg-[#111B27] text-white">
+                <div className="flex items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                    <span className="ml-2">Loading transactions...</span>
                 </div>
             </div>
         );
@@ -123,7 +111,7 @@ export default function GroupTransactions({ groupId }: { groupId: string }) {
 
     if (error) {
         return (
-            <div className="w-full p-4 bg-zinc-950 text-white min-h-screen">
+            <div className="w-full p-4 bg-[#111B27] text-white">
                 <div
                     className="bg-red-900 border border-red-600 text-red-100 px-4 py-3 rounded relative"
                     role="alert"
@@ -136,12 +124,14 @@ export default function GroupTransactions({ groupId }: { groupId: string }) {
     }
 
     return (
-        <div className="w-auto p-4 space-y-4  text-white min-h-screen drop-shadow-lg">
+        <div className="w-auto space-y-4 text-white">
             <div className="flex justify-between items-center">
                 <Tabs
                     defaultValue="all"
                     className="w-auto"
-                    onValueChange={(value) => setViewMode(value)}
+                    onValueChange={(value) =>
+                        setViewMode(value as "all" | "monthly" | "weekly")
+                    }
                 >
                     <TabsList className="bg-[#1A1F2E]">
                         <TabsTrigger
@@ -222,7 +212,7 @@ export default function GroupTransactions({ groupId }: { groupId: string }) {
                                     Category
                                 </th>
                                 <th className="text-left px-4 py-2 text-sm font-normal text-gray-400">
-                                    User
+                                    Paid by
                                 </th>
                             </tr>
                         </thead>
@@ -242,7 +232,7 @@ export default function GroupTransactions({ groupId }: { groupId: string }) {
                                         {transaction.description}
                                     </td>
                                     <td className="px-4 py-3 text-sm text-gray-300">
-                                        ₹{transaction.amount.toFixed(2)}
+                                        ₹ {transaction.amount.toFixed(2)}
                                     </td>
                                     <td className="px-4 py-3 text-sm text-gray-300">
                                         <div className="flex items-center gap-2">
