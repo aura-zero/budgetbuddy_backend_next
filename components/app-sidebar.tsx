@@ -57,7 +57,7 @@ export function AppSidebar() {
     return (
         <div className="flex ">
             <Sidebar>
-                <SidebarContent className="flex bg-[#07011F] items-center  justify-items-center overflow-x-hidden">
+                <SidebarContent className="flex bg-[#07011F] items-center  justify-items-center ">
                     <SidebarGroup>
                         <SidebarGroupLabel className="text-[#FF9601] text-2xl mb-5">
                             BudgetBuddy

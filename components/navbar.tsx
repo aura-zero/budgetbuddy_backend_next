@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -28,13 +29,30 @@ export default function Navbar() {
     };
 
     return (
-        <nav className="bg-[#07011F] text-white ">
+        <nav className="flex bg-[#1f2335] text-white rounded-full my-auto mx-auto mt-2">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     <div className="flex items-center">
                         <Link href="/" className="flex-shrink-0 text-xl font-bold">
-                            BudgetBuddy
+                            <Image
+                                src="/logos/budget-buddy.png"
+                                alt="Budget Buddy Logo"
+                                width={40}
+                                height={40}
+                            />
                         </Link>
+                        <div className="hidden md:block">
+                            <div className="ml-2 flex items-baseline space-x-4">
+                                <Link
+                                    href="/"
+                                    className="py-2 rounded-md text-xl font-medium"
+                                >
+                                    <span className="text-xl font-medium">
+                                        Budget Buddy
+                                    </span>
+                                </Link>
+                            </div>
+                        </div>
                         <div className="hidden md:block">
                             <div className="ml-10 flex items-baseline space-x-4">
                                 <Link
